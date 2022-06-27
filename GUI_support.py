@@ -50,13 +50,13 @@ CONCENTRATIONS = [
 FEATURE_COLUMNS = PROCESSING + CONCENTRATIONS
 
 def calculate_properties(value_dict):
-    preprocess_ys = load('../models/preprocessor_ys.joblib') 
-    preprocess_ts = load('../models/preprocessor_ts.joblib') 
-    preprocess_elong = load('../models/preprocessor_elong.joblib') 
+    preprocess_ys = load('./models/preprocessor_ys.joblib') 
+    preprocess_ts = load('./models/preprocessor_ts.joblib') 
+    preprocess_elong = load('./models/preprocessor_elong.joblib') 
 
-    rf_ys = load('../models/rf_ys.joblib')
-    rf_ts = load('../models/rf_ts.joblib')
-    rf_elong = load('../models/rf_elong.joblib')
+    rf_ys = load('./models/rf_ys.joblib')
+    rf_ts = load('./models/rf_ts.joblib')
+    rf_elong = load('./models/rf_elong.joblib')
     preprocessed_input_ys = preprocess_ys.transform(pd.DataFrame(value_dict, index=[0]))
     preprocessed_input_ts = preprocess_ts.transform(pd.DataFrame(value_dict, index=[0]))
     preprocessed_input_elong = preprocess_elong.transform(pd.DataFrame(value_dict, index=[0]))
