@@ -24,14 +24,14 @@ PROCESSES_ENCODING = {
     "as-cast or as-fabricated": "No Processing",
     "Annealed, Solutionised": "Solutionised",
     "H (soft)": "Strain hardened",
-    "H (hard": "Strain Harderned (Hard)",
+    "H (hard)": "Strain Harderned (Hard)",
     "T1": "Naturally aged",
-    "T3": "Solutionised + Cold Worked + Naturally aged",
+    "T3 (incl. T3xx)": "Solutionised + Cold Worked + Naturally aged",
     "T4": "Solutionised + Naturally aged",
     "T5": "Artificial aged",
-    "T6": "Solutionised  + Artificially peak aged",
-    "T7": "Solutionised + Artificially over aged",
-    "T8": "Solutionised + Artificially over aged",
+    "T6 (incl. T6xx)": "Solutionised  + Artificially peak aged",
+    "T7 (incl. T7xx)": "Solutionised + Artificially over aged",
+    "T8 (incl. T8xx)": "Solutionised + Artificially over aged",
 }
 
 PROCESSES_LIST = list(PROCESSES_ENCODING.keys())
@@ -98,7 +98,14 @@ def build_gui():
             values[0] = PROCESSES_ENCODING[values[0]]
             values[1:] = [concentrations / 100 for concentrations in values[1:]]
             values.insert(2, 1 - sum(values[1:]))
+            print("Calculating Aluminium as balance of other alloying element")
             input_dict = dict(zip(FEATURE_COLUMNS, values))
+
+            print("Concentration of Elements:")
+            for element, concentration in input_dict.items():
+                if element != "Processing" and concentration > 1e-06:
+                    print(element, ":", concentration, "wt fraction")
+
             calculate_properties(input_dict)
 
     widget_list = []
