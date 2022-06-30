@@ -1,9 +1,11 @@
 from turtle import right
 import ipywidgets as widgets
+from termcolor import colored
 
 from IPython.display import display
 from ipywidgets import VBox, HBox
 from joblib import load
+from tabulate import tabulate
 
 import pandas as pd
 
@@ -87,9 +89,11 @@ def calculate_properties(value_dict):
     ts = rf_ts.predict(preprocessed_input_ts)
     elong = rf_elong.predict(preprocessed_input_elong)
 
-    print(f"Yield Strength: {ys[0]:.2f} MPa")
-    print(f"Tensile Strength: {ts[0]:.2f} MPa")
-    print(f"Elongation: {elong[0]:.2f}")
+    print()
+    print()
+    print("Yield Strength:", colored(f"{ys[0]:.2f} MPa", "green"))
+    print("Tensile Strength:", colored(f"{ts[0]:.2f} MPa", "green"))
+    print("Elongation:", colored(f"{elong[0]:.2f} %", "green"))
 
 
 def build_gui():
@@ -102,11 +106,17 @@ def build_gui():
             values.insert(2, 1 - sum(values[1:]))
             print("Calculating Aluminium as balance of other alloying element")
             input_dict = dict(zip(FEATURE_COLUMNS, values))
-
+            print()
             print("Concentration of Elements:")
+            print_conc_list = []
             for element, concentration in input_dict.items():
                 if element != "Processing" and concentration > 1e-06:
-                    print(f"{element}: {concentration:.3f} wt fraction")
+                    print_conc_list.append([element, concentration])
+            print(
+                tabulate(
+                    print_conc_list, headers=["Element", "Concentration (wt fraction)"]
+                )
+            )
 
             calculate_properties(input_dict)
 
