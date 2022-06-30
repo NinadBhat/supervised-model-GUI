@@ -1,7 +1,8 @@
+from turtle import right
 import ipywidgets as widgets
 
 from IPython.display import display
-from ipywidgets import VBox
+from ipywidgets import VBox, HBox
 from joblib import load
 
 import pandas as pd
@@ -94,9 +95,10 @@ def calculate_properties(value_dict):
 def build_gui():
     def print_properties(b):
         with output:
-            values = [item.value for item in widget_list[:-2]]
-            values[0] = PROCESSES_ENCODING[values[0]]
-            values[1:] = [concentrations / 100 for concentrations in values[1:]]
+            left_conc = [item.value / 100 for item in concentration_widget_left]
+            right_conc = [item.value / 100 for item in concentration_widget_right]
+            process = PROCESSES_ENCODING[start_widget_list[0].value]
+            values = [process] + left_conc + right_conc
             values.insert(2, 1 - sum(values[1:]))
             print("Calculating Aluminium as balance of other alloying element")
             input_dict = dict(zip(FEATURE_COLUMNS, values))
@@ -104,39 +106,49 @@ def build_gui():
             print("Concentration of Elements:")
             for element, concentration in input_dict.items():
                 if element != "Processing" and concentration > 1e-06:
-                    print(element, ":", concentration, "wt fraction")
+                    print(f"{element}: {concentration:.3f} wt fraction")
 
             calculate_properties(input_dict)
 
-    widget_list = []
+    start_widget_list = []
+    concentration_widget_left = []
+    concentration_widget_right = []
+    end_widget_list = []
+
     process_type = widgets.Dropdown(
         options=PROCESSES_LIST,
         value="as-cast or as-fabricated",
         description="Process:",
         disabled=False,
     )
-    widget_list.append(process_type)
+    start_widget_list.append(process_type)
+
     concentration_copy = CONCENTRATIONS[:]
     concentration_copy.remove("Al")
-    for element in concentration_copy:
-        widget_list.append(
-            widgets.BoundedFloatText(
-                value=0,
-                min=0,
-                max=100.0,
-                step=0.1,
-                description=f"{element}:",
-                disabled=False,
-            )
+    for index, element in enumerate(concentration_copy):
+        widget_conc = widgets.BoundedFloatText(
+            value=0,
+            min=0,
+            max=100.0,
+            step=0.1,
+            description=f"{element}:",
+            disabled=False,
         )
+        if index <= len(concentration_copy) // 2:
+            concentration_widget_left.append(widget_conc)
+        else:
+            concentration_widget_right.append(widget_conc)
 
     button = widgets.Button(description="Calculate Properties")
     output = widgets.Output()
 
     button.on_click(print_properties)
 
-    widget_list.append(button)
+    end_widget_list.append(button)
 
-    widget_list.append(output)
-
-    display(VBox(widget_list))
+    end_widget_list.append(output)
+    left_widgets = VBox(concentration_widget_left)
+    right_widgets = VBox(concentration_widget_right)
+    display(VBox(start_widget_list))
+    display(HBox([left_widgets, right_widgets]))
+    display(VBox(end_widget_list))
