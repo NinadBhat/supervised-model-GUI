@@ -113,7 +113,7 @@ def build_gui():
                 if element != "Processing" and concentration > 1e-06:
                     print_conc_list.append([element, concentration * 100])
             print(
-                tabulate(print_conc_list, headers=["Element", "Concentration (wt %)"])
+                tabulate(print_conc_list, headers=["Element", "Concentration (wt. %)"])
             )
 
             calculate_properties(input_dict)
